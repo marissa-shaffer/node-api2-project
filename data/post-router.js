@@ -69,7 +69,7 @@ router.get("/api/posts", (res, req) => {
     })
 })
 
-router.get("api/posts/:id", (res, req) => {
+router.get("/api/posts/:id", (res, req) => {
     db.findById(req.params.id)
     .then((post) => {
         if(post){
@@ -84,6 +84,30 @@ router.get("api/posts/:id", (res, req) => {
         console.log(error)
         res.status(500).json({
             error: "The post information could not be retrieved." 
+        })
+    })
+})
+
+router.get("/api/posts/:id/comments", (req, res) => {
+    db.findById(req.params.id)
+    .then((post) => {
+        res.json(post)
+    })
+    .catch((error) => {
+        console.log(error)
+        res.status(404).json({
+            message: "The post with the specified ID does not exist."
+        })
+    })
+
+    db.findPostComments(req.params.id)
+    .then((post) => {
+        res.status(200).json(post)
+    })
+    .catch((error) => {
+        console.log(error)
+        res.status(500).json({
+            errorMessage: "The comments information could not be retrieved."
         })
     })
 })
