@@ -52,4 +52,21 @@ router.post("/api/posts/:id/comments", (req, res) => {
     })
 })
 
+router.get("/api/posts", (res, req) => {
+    const options = {
+        sortBy: req.query.sortBy,
+        limit: req.query.limit,
+    }
+    db.find(options)
+    .then((posts) => {
+        res.status(200).json(posts)
+    })
+    .catch((error) => {
+        console.log(error)
+        res.status(500).json({
+            error: "The post information could not be retrieved."
+        })
+    })
+})
+
 module.exports = router
