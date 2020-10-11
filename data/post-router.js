@@ -4,7 +4,7 @@ const db = require("./db")
 
 const router = express.Router()
 
-router.post("/posts", (req, res) => {
+router.post("/", (req, res) => {
     if (!req.body.title || !req.body.contents) {
 		return res.status(400).json({
 			message: "Please provide title and contents for the post.",
@@ -23,31 +23,32 @@ router.post("/posts", (req, res) => {
 		})
 })
 
-router.post("/posts/:id/comments", (req, res) => {
-   db.findById(req.params.id)
-    .then((post) => {
-        res.status(200).json(post)
-    })
-    .catch((error) => {
-        console.log(error)
+router.post("/:id/comments", (req, res) => {
+    const { id } = req.params;
+    const comment = {...req.body, post_id: req.params.id };
+    if (!req.params.id) {
         res.status(404).json({
-            message: "The post with the specified ID does not exist."
+            message: "The post with the specified ID does not exist." 
         })
-    })
-
-	db.insertComment(req.params.id, req.body)
-		.then((comment) => {
-			res.status(201).json(comment)
-		})
-		.catch((error) => {
-			console.log(error)
-			res.status(500).json({
-				error: "There was an error while saving the comment to the database",
-			})
-		})
+    } else if (!req.body.text) {
+        res.status(400).json({ 
+            errorMessage: "Please provide text for the comment." 
+        })
+    } else {
+        db.insertComment(comment)
+            .then(comment => {
+                res.status(201).json(comment)
+            })
+            .catch(error => {
+                console.log(error)
+                res.status(500).json({
+                    error: "There was an error while saving the comment to the database"
+                })
+            })
+    }
 })
 
-router.get("/posts", (req, res) => {
+router.get("/", (req, res) => {
     db.find(req.params)
     .then((posts) => {
         res.json(posts)
@@ -60,7 +61,7 @@ router.get("/posts", (req, res) => {
     })
 })
 
-router.get("/posts/:id", (req, res) => {
+router.get("/:id", (req, res) => {
     db.findById(req.params.id)
 		.then((post) => {
 			if (post) {
@@ -79,7 +80,7 @@ router.get("/posts/:id", (req, res) => {
 		})
 })
 
-router.get("/posts/:id/comments", (req, res) => {
+router.get("/:id/comments", (req, res) => {
     db.findPostComments(req.params.id)
         .then((comments) => {
             if (comments) {
@@ -99,7 +100,7 @@ router.get("/posts/:id/comments", (req, res) => {
         })
 }) 
 
-router.delete("/posts/:id", (req, res) => {
+router.delete("/:id", (req, res) => {
     db.remove(req.params.id)
     .then((count) => {
         if (count > 0) {
@@ -120,7 +121,7 @@ router.delete("/posts/:id", (req, res) => {
     })
 })
 
-router.put("/posts/:id", (req, res) => {
+router.put("/:id", (req, res) => {
     if (!req.body.title || !req.body.contents) {
 		return res.status(400).json({
 			errorMessage: "Please provide title and contents for the post.",

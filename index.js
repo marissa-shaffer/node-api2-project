@@ -6,7 +6,7 @@ const server = express()
 const port = 9000
 
 server.use(express.json())
-server.use("/", postRouter)
+server.use("/posts", postRouter)
 
 server.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`)
