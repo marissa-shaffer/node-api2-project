@@ -47,7 +47,7 @@ router.post("/posts/:id/comments", (req, res) => {
 		})
 })
 
-router.get("/post", (req, res) => {
+router.get("/posts", (req, res) => {
     db.find(req.params)
     .then((posts) => {
         res.json(posts)
@@ -60,7 +60,7 @@ router.get("/post", (req, res) => {
     })
 })
 
-router.get("/post/:id", (req, res) => {
+router.get("/posts/:id", (req, res) => {
     db.findById(req.params.id)
 		.then((post) => {
 			if (post) {
@@ -78,5 +78,25 @@ router.get("/post/:id", (req, res) => {
 			})
 		})
 })
+
+router.get("/posts/:id/comments", (req, res) => {
+    db.findPostComments(req.params.id)
+        .then((comments) => {
+            if (comments) {
+                res.json(comments)
+            } else {
+                res.status(404).json({
+                    message: "The post with the specified ID does not exist." 
+                })
+            }
+           
+        })
+        .catch((error) => {
+            console.log(error)
+            res.status(500).json({
+                message: "Error getting comments"
+            })
+        })
+}) 
 
 module.exports = router
